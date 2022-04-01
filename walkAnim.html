@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <title>walkAnim.html</title>
+    <script type="text/javascript" src="simpleGame.js"></script>
+    <script type="text/javascript">
+        var game
+        var background
+        var character
+        var fireball
+
+        var angleCharacter
+
+        function init() {
+            game = new Scene()
+            background = new Sprite(game, "map_1.png", 1800, 900)
+            background.setSpeed(0, 0)
+            background.setPosition(900, 450)
+            character = new Sprite(game, "Carbon Ghost.png", 128, 94)
+            character.loadAnimation(64, 94, 16, 23)
+            character.generateAnimationCycles()
+            character.renameCycles(new Array("down", "right", "up", "left"))
+            character.setAnimationSpeed(500)
+
+            fireball = new FireBall()
+
+            //start paused
+            character.setPosition(440, 380)
+            lastPosition = [character.x, character.y]
+            character.setSpeed(0)
+            character.pauseAnimation()
+            character.setCurrentCycle("down")
+
+            game.start();
+        } // end init
+
+        function update() {
+            game.clear()
+            checkKeys()
+
+            background.update()
+            character.update()
+            fireball.update()
+            fireball.positionCheck()
+        } // end update
+
+        function checkKeys() {
+            if (keysDown[K_LEFT]) {
+                angleCharacter = 'left'
+                character.playAnimation()
+                character.changeXby(-3)
+                character.setMoveAngle(270)
+                character.setCurrentCycle("left")
+            }
+            if (keysDown[K_RIGHT]) {
+                angleCharacter = 'right'
+                character.playAnimation()
+                character.changeXby(3)
+                character.setMoveAngle(90)
+                character.setCurrentCycle("right")
+            }
+            if (keysDown[K_UP]) {
+                angleCharacter = 'up'
+                character.playAnimation()
+                character.changeYby(-3)
+                character.setMoveAngle(0)
+                character.setCurrentCycle("up")
+            }
+            if (keysDown[K_DOWN]) {
+                angleCharacter = 'down'
+                character.playAnimation()
+                character.changeYby(3)
+                character.setMoveAngle(180)
+                character.setCurrentCycle("down")
+            }
+
+            if (keysDown[K_SPACE]) {
+                // character.setSpeed(0)
+                // character.pauseAnimation()
+                // character.setCurrentCycle("down")
+                if (fireball.getAvailable()) {
+                    fireball.fire()
+                }
+
+
+            }
+
+        }
+
+        function FireBall() {
+            var fireballAvailable = true
+            var fireballShown = false
+            sFireball = new Sprite(game, "./element/fire_ball.png", 30, 20)
+            sFireball.hide()
+
+            sFireball.getAvailable = function() {
+                return fireballAvailable
+            }
+
+            sFireball.fire = function() {
+                this.show()
+                fireballShown = true
+
+                this.setSpeed(15)
+                this.setBoundAction(DIE)
+                this.setPosition(character.x, character.y)
+                switch (angleCharacter) {
+                    case ('up'):
+                        this.setAngle(0)
+                        break
+                    case ('down'):
+                        this.setAngle(180)
+                        break
+                    case ('left'):
+                        this.setAngle(270)
+                        break
+                    case ('right'):
+                        this.setAngle(90)
+                        break
+                }
+                this.setSpeed(15)
+            }
+
+            sFireball.positionCheck = function() {
+                if (sFireball.x < 0 || sFireball.x > 800 || sFireball.y < 0 || sFireball.y > 600 || !fireballShown) {
+                    fireballAvailable = true
+                } else {
+                    fireballAvailable = false
+                }
+            }
+
+            return sFireball
+        }
+    </script>
+</head>
+
+<body onload="init()">
+</body>
+
+</html>
