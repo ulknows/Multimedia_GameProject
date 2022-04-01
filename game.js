@@ -1,0 +1,344 @@
+//environment
+var game
+var background
+var screenWidth = 1800
+var screenHeight = 900
+var state = 1
+
+//setting
+var bgSound = false
+
+//character
+var character
+
+//entity
+var warp;
+var countMon = 2
+var monster = []
+
+function init() {
+    //game and background
+    if (state == 1) {
+        game = new Scene()
+        background = new Sprite(game, "map_1.png", screenWidth, screenHeight)
+        background.setSpeed(0, 0)
+        background.setPosition(900, 450)
+
+        //monster and character
+        character = Player()
+        for (let i = 0; i < countMon; i++) {
+            monster[i] = new Monster()
+        }
+
+        buildSound();
+
+        //game settings
+        game.start();
+    } else if (state == 2) {
+        game = new Scene()
+        background = new Sprite(game, "map_1.png", screenWidth, screenHeight)
+        background.setSpeed(0, 0)
+        background.setPosition(900, 450)
+
+        //monster and character
+        character = Player()
+        for (let i = 0; i < countMon; i++) {
+            monster[i] = new Monster()
+        }
+
+        //game settings
+        game.start();
+    }
+}
+
+var created = false
+
+function update() {
+    if (state == 1) {
+        //game update
+        game.clear()
+        background.update()
+        if (bgSound) {
+            backgroundSound.play()
+        }
+
+        //entity check
+        entityCheck()
+
+        //character update
+        character.checkKeys()
+        character.update()
+        character.fireball.update()
+        character.fireball.positionCheck()
+
+        document.getElementById("characterStatus").innerHTML = showStats()
+    }
+}
+
+function buildSound() {
+    fireballSound = new Sound("fireball.mp3")
+    flySound = new Sound("b_fly.wav")
+    backgroundSound = new Sound("videoplayback_1.mp4")
+}
+
+function entityCheck() {
+    //monster movement and collision check
+    for (let i = 0; i < countMon; i++) {
+        monster[i].wriggle()
+        monster[i].update()
+        character.checkCollision(monster[i])
+        character.fireball.checkCollision(monster[i])
+    }
+
+    //check condition to next level
+    if (character.killedCount >= 2) {
+        warp = new Warp();
+        warp.update()
+        warp.checkCollision(character)
+    }
+}
+
+showStats = function() {
+    var status = "<table><th><strong>Character</strong></th><th></th>"
+    if (character.skillPoint > 0) {
+        status += "<br><tr><td>Skillpoint : " + character.skillPoint + "<td></tr><br>"
+    }
+
+    status += "<tr><td>HP: " + character.characterHP + "/" + character.characterMHP + "</td><td>";
+    if (character.skillPoint > 0) {
+        status += "<button id=\"upgradeHP\" onclick=\"upgrade(1)\">+</div>"
+    }
+    status += "</td></tr>"
+
+    status += "<tr><td>damage : " + character.characterATK + "</td><td>";
+    if (character.skillPoint > 0) {
+        status += "<button id=\"upgradeATK\">+</button>"
+    }
+    status += "</td></tr>"
+
+    status += "<tr><td>defend : " + character.characterDEF + "</td><td>";
+    if (character.skillPoint > 0) {
+        status += "<button id=\"upgradeDEF\">+</button>"
+    }
+    status += "</td></tr>"
+
+    status += "<tr><td>speed: " + character.characterSPD + "</td><td>";
+    if (character.skillPoint > 0) {
+        status += "<button id=\"upgradeSPD\">+</button>"
+    }
+    status += "</td></tr>"
+
+    return status;
+}
+
+
+
+function upgrade(status) {
+    switch (status) {
+        case (1):
+            character.characterMHP += 10
+            character.characterHP = character.characterMHP
+            break;
+        case (2):
+            character.characterATK += 10
+            break;
+        case (3):
+            character.characterDEF += 10
+            break;
+        case (4):
+            character.characterSPD += 10
+            break;
+    }
+}
+
+function Player() {
+    //creating character and set position
+    var tCharacter = new Sprite(game, "Carbon Ghost.png", 128, 94)
+    tCharacter.setPosition(440, 380)
+    tCharacter.setSpeed(0)
+
+    //creating fireball
+    tCharacter.fireball = FireBall()
+    tCharacter.angleCharacter = "down"
+
+    //setting status of character
+    tCharacter.characterHP = 100
+    tCharacter.characterMHP = 100
+    tCharacter.characterATK = 50
+    tCharacter.characterDEF = 50
+    tCharacter.characterSPD = 50
+    tCharacter.skillPoint = 0
+    tCharacter.killedCount = 0;
+
+    //animation of character
+    tCharacter.loadAnimation(64, 94, 16, 23)
+    tCharacter.generateAnimationCycles()
+    tCharacter.renameCycles(new Array("down", "right", "up", "left"))
+    tCharacter.setAnimationSpeed(500)
+    tCharacter.setCurrentCycle("down")
+    tCharacter.pauseAnimation()
+
+    tCharacter.checkKeys = function() {
+        if (keysDown[K_LEFT]) {
+            angleCharacter = 'left'
+            tCharacter.playAnimation()
+            tCharacter.changeXby(-3)
+            tCharacter.setMoveAngle(270)
+            tCharacter.setCurrentCycle("left")
+        }
+        if (keysDown[K_RIGHT]) {
+            angleCharacter = 'right'
+            tCharacter.playAnimation()
+            tCharacter.changeXby(3)
+            tCharacter.setMoveAngle(90)
+            tCharacter.setCurrentCycle("right")
+        }
+        if (keysDown[K_UP]) {
+            angleCharacter = 'up'
+            tCharacter.playAnimation()
+            tCharacter.changeYby(-3)
+            tCharacter.setMoveAngle(0)
+            tCharacter.setCurrentCycle("up")
+        }
+        if (keysDown[K_DOWN]) {
+            angleCharacter = 'down'
+            tCharacter.playAnimation()
+            tCharacter.changeYby(3)
+            tCharacter.setMoveAngle(180)
+            tCharacter.setCurrentCycle("down")
+        }
+        if (keysDown[K_LEFT] || keysDown[K_RIGHT] || keysDown[K_UP] || keysDown[K_DOWN]) {
+            flySound.play()
+        }
+
+        if (keysDown[K_SPACE]) {
+            if (this.fireball.getAvailable()) {
+                this.fireball.fire()
+                fireballSound.play()
+            }
+        }
+    }
+
+    tCharacter.checkCollision = function(monster) {
+        if (monster.collidesWith(this)) {
+            this.characterHP -= 20;
+            console.log(this.characterHP + ' / ' + this.characterMHP)
+            if (this.characterHP <= 0) {
+                game.stop()
+            }
+            monster.reset()
+        }
+    }
+
+    return tCharacter
+}
+
+function Warp() {
+    var tWarp = new Sprite(game, "./portal.gif", 100, 200)
+    tWarp.setPosition(1200, 400)
+    tWarp.setSpeed(0)
+
+    tWarp.checkCollision = function(character) {
+        if (this.collidesWith(character)) {
+            window.location.href = "./Stage_2.html";
+        }
+    }
+
+    return tWarp
+}
+
+function FireBall() {
+    var fireballAvailable = true
+    var fireballShown = false
+    var sFireball = new Sprite(game, "./element/fire_ball.png", 30, 20)
+    sFireball.hide()
+
+    sFireball.getAvailable = function() {
+        return fireballAvailable
+    }
+
+    sFireball.fire = function() {
+        this.show()
+        fireballShown = true
+
+        this.setSpeed(15)
+        this.setBoundAction(DIE)
+        this.setPosition(character.x, character.y)
+        switch (angleCharacter) {
+            case ('up'):
+                this.setAngle(0)
+                break
+            case ('down'):
+                this.setAngle(180)
+                break
+            case ('left'):
+                this.setAngle(270)
+                break
+            case ('right'):
+                this.setAngle(90)
+                break
+        }
+        this.setSpeed(15)
+    }
+
+    sFireball.positionCheck = function() {
+        if (sFireball.x < 0 || sFireball.x > 1440 || sFireball.y < 0 || sFireball.y > 900 || !fireballShown) {
+            fireballAvailable = true
+        } else {
+            fireballAvailable = false
+        }
+    }
+
+    sFireball.checkCollision = function(monster) {
+        if (monster.collidesWith(this)) {
+            monster.reset()
+            character.skillPoint++;
+            character.killedCount++;
+            console.log('Skill Point : ' + character.skillPoint)
+            this.reset()
+        }
+    }
+    sFireball.reset = function() {
+        this.setPosition(1440, 900)
+        this.hide()
+    }
+
+    return sFireball
+}
+
+function Monster() {
+    //monster control
+    var speed = 10
+    var hitboxPlayer = 20
+    var rangePlayerSpawn = 200
+
+    var tMonster = new Sprite(game, "Shadow Brute.png", 64, 256);
+    tMonster.loadAnimation(64, 256, 16, 32)
+    tMonster.generateAnimationCycles()
+    tMonster.setAnimationSpeed(500)
+
+    tMonster.setSpeed(0);
+    tMonster.wriggle = function() {
+        //change direction
+        if (this.x > character.x + hitboxPlayer) {
+            this.changeXby(0 - speed)
+        } else if (this.x < character.x - hitboxPlayer) {
+            this.changeXby(speed)
+        }
+        if (this.y > character.y + hitboxPlayer) {
+            this.changeYby(Math.floor(0 - (speed / (screenWidth / screenHeight))))
+        } else if (this.y < character.y - hitboxPlayer) {
+            this.changeYby(Math.floor(speed / (screenWidth / screenHeight)))
+        }
+    }
+    tMonster.reset = function() {
+        //set new random position
+        do {
+            newX = Math.random() * this.cWidth;
+            newY = Math.random() * this.cHeight;
+            this.setPosition(Math.floor(newX), Math.floor(newY));
+        } while (this.x < character.x + rangePlayerSpawn && this.x > character.x - rangePlayerSpawn && this.y < character.y + rangePlayerSpawn && this.y > character.y - rangePlayerSpawn)
+    }
+    tMonster.reset();
+    return tMonster;
+}
