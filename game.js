@@ -245,6 +245,8 @@ function Player() {
                 game.stop()
             }
             monster.reset()
+            character.skillPoint++;
+            character.killedCount++;
         }
     }
 
@@ -362,7 +364,7 @@ function Monster() {
 
     //monster stats
     tMonster.setSpeed(0);
-    tMonster.monsterMHP = Math.floor((((Math.random() * 100) % 25) - 35) + character.characterHP);
+    tMonster.monsterMHP = Math.floor((((Math.random() * 100) % 25) - 35) + character.characterMHP);
     tMonster.monsterHP = this.monsterMHP
     tMonster.monsterATK = Math.floor(this.monsterHP / 10);
 
@@ -386,7 +388,7 @@ function Monster() {
             newX = Math.random() * this.cWidth;
             newY = Math.random() * this.cHeight;
             this.setPosition(Math.floor(newX), Math.floor(newY));
-            tMonster.monsterMHP = ((Math.random() % 25) - 35) + character.characterHP;
+            tMonster.monsterMHP = ((Math.random() % 25) - 35) + character.characterMHP;
             tMonster.monsterHP = this.monsterMHP
             tMonster.monsterATK = Math.floor(this.monsterHP / 10);
         } while (this.x < character.x + rangePlayerSpawn && this.x > character.x - rangePlayerSpawn && this.y < character.y + rangePlayerSpawn && this.y > character.y - rangePlayerSpawn)
