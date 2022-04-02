@@ -173,7 +173,7 @@ function Player() {
     tCharacter.characterMHP = 100
     tCharacter.characterATK = 50
     tCharacter.characterDEF = 50
-    tCharacter.characterSPD = 50
+    tCharacter.characterSPD = 100
     tCharacter.skillPoint = 0
     tCharacter.killedCount = 0;
 
@@ -186,31 +186,32 @@ function Player() {
     tCharacter.pauseAnimation()
 
     tCharacter.checkKeys = function() {
+        characterMovementSpeed = Math.floor((this.characterSPD / 100) * 2.5)
         if (keysDown[K_LEFT]) {
             angleCharacter = 'left'
             tCharacter.playAnimation()
-            tCharacter.changeXby(-3)
+            tCharacter.changeXby(characterMovementSpeed)
             tCharacter.setMoveAngle(270)
             tCharacter.setCurrentCycle("left")
         }
         if (keysDown[K_RIGHT]) {
             angleCharacter = 'right'
             tCharacter.playAnimation()
-            tCharacter.changeXby(3)
+            tCharacter.changeXby(characterMovementSpeed)
             tCharacter.setMoveAngle(90)
             tCharacter.setCurrentCycle("right")
         }
         if (keysDown[K_UP]) {
             angleCharacter = 'up'
             tCharacter.playAnimation()
-            tCharacter.changeYby(-3)
+            tCharacter.changeYby(characterMovementSpeed)
             tCharacter.setMoveAngle(0)
             tCharacter.setCurrentCycle("up")
         }
         if (keysDown[K_DOWN]) {
             angleCharacter = 'down'
             tCharacter.playAnimation()
-            tCharacter.changeYby(3)
+            tCharacter.changeYby(characterMovementSpeed)
             tCharacter.setMoveAngle(180)
             tCharacter.setCurrentCycle("down")
         }
