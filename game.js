@@ -101,30 +101,30 @@ function entityCheck() {
 showStats = function() {
     var status = "<table><th><strong>Character</strong></th><th></th>"
     if (character.skillPoint > 0) {
-        status += "<br><tr><td>Skillpoint : " + character.skillPoint + "<td></tr><br>"
+        status += "<tr><td>Skillpoint : " + character.skillPoint + "<td></tr><tr></tr>"
     }
 
     status += "<tr><td>HP: " + character.characterHP + "/" + character.characterMHP + "</td><td>";
     if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeHP\" onclick=\"upgrade(1)\">+</div>"
+        status += "<button id=\"upgradeHP\">Press (A) to upgrade</button>"
     }
     status += "</td></tr>"
 
     status += "<tr><td>damage : " + character.characterATK + "</td><td>";
     if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeATK\">+</button>"
+        status += "<button id=\"upgradeATK\">Press (S) to upgrade</button>"
     }
     status += "</td></tr>"
 
     status += "<tr><td>defend : " + character.characterDEF + "</td><td>";
     if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeDEF\">+</button>"
+        status += "<button id=\"upgradeDEF\">Press (D) to upgrade</button>"
     }
     status += "</td></tr>"
 
     status += "<tr><td>speed: " + character.characterSPD + "</td><td>";
     if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeSPD\">+</button>"
+        status += "<button id=\"upgradeSPD\">Press (F) to upgrade</button>"
     }
     status += "</td></tr>"
 
@@ -133,23 +133,7 @@ showStats = function() {
 
 
 
-function upgrade(status) {
-    switch (status) {
-        case (1):
-            character.characterMHP += 10
-            character.characterHP = character.characterMHP
-            break;
-        case (2):
-            character.characterATK += 10
-            break;
-        case (3):
-            character.characterDEF += 10
-            break;
-        case (4):
-            character.characterSPD += 10
-            break;
-    }
-}
+
 
 function Player() {
     //creating character and set position
@@ -217,11 +201,45 @@ function Player() {
                 fireballSound.play()
             }
         }
+
+        if (this.skillPoint > 0) {
+            if (keysDown[K_A]) {
+                this.upgrade(1)
+            } else if (keysDown[K_S]) {
+                this.upgrade(2)
+            } else if (keysDown[K_D]) {
+                this.upgrade(3)
+            } else if (keysDown[K_F]) {
+                this.upgrade(4)
+            }
+        }
+    }
+
+    tCharacter.upgrade = function(status) {
+        switch (status) {
+            case (1):
+                this.characterMHP += 10
+                this.characterHP = this.characterMHP
+                this.skillPoint--
+                    break;
+            case (2):
+                this.characterATK += 10
+                this.skillPoint--
+                    break;
+            case (3):
+                this.characterDEF += 10
+                this.skillPoint--
+                    break;
+            case (4):
+                this.characterSPD += 10
+                this.skillPoint--
+                    break;
+        }
     }
 
     tCharacter.checkCollision = function(monster) {
         if (monster.collidesWith(this)) {
-            this.characterHP -= 20;
+            this.characterHP -= monster.monsterATK;
             console.log(this.characterHP + ' / ' + this.characterMHP)
             if (this.characterHP <= 0) {
                 game.stop()
@@ -234,17 +252,35 @@ function Player() {
 }
 
 function Warp() {
-    var tWarp = new Sprite(game, "./portal.gif", 100, 200)
-    tWarp.setPosition(1200, 400)
-    tWarp.setSpeed(0)
+    if (state == 1) {
+        var tWarp = new Sprite(game, "./portal.gif", 100, 200)
+        tWarp.setPosition(1200, 400)
+        tWarp.setSpeed(0)
 
-    tWarp.checkCollision = function(character) {
-        if (this.collidesWith(character)) {
-            window.location.href = "./Stage_2.html";
+        tWarp.checkCollision = function(character) {
+            if (this.collidesWith(character)) {
+                window.location.href = "./Stage_2.html";
+            }
         }
-    }
 
-    return tWarp
+        return tWarp
+    } else if (state == 2) {
+        var tWarp = new Sprite(game, "./portal.gif", 100, 200)
+        tWarp.setPosition(1200, 400)
+        tWarp.setSpeed(0)
+
+        tWarp.checkCollision = function(character) {
+            if (this.collidesWith(character)) {
+                window.location.href = "./Stage_3.html";
+            }
+        }
+
+        return tWarp
+    } else {
+
+
+        return tWarp
+    }
 }
 
 function FireBall() {
@@ -312,12 +348,18 @@ function Monster() {
     var hitboxPlayer = 20
     var rangePlayerSpawn = 200
 
+    //creating monster
     var tMonster = new Sprite(game, "Shadow Brute.png", 64, 256);
     tMonster.loadAnimation(64, 256, 16, 32)
     tMonster.generateAnimationCycles()
     tMonster.setAnimationSpeed(500)
 
+    //monster stats
     tMonster.setSpeed(0);
+    tMonster.monsterHP = ((Math.random() % 25) - 35) + character.characterHP;
+    tMonster.monsterATK = Math.floor(this.monsterHP / 10);
+
+
     tMonster.wriggle = function() {
         //change direction
         if (this.x > character.x + hitboxPlayer) {
