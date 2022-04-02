@@ -327,10 +327,16 @@ function FireBall() {
 
     sFireball.checkCollision = function(monster) {
         if (monster.collidesWith(this)) {
-            monster.reset()
-            character.skillPoint++;
-            character.killedCount++;
-            console.log('Skill Point : ' + character.skillPoint)
+
+            monster.monsterHP -= character.characterATK
+            console.log(monster.monsterHP + '/' + monster.monsterMHP)
+            if (monster.monsterHP <= 0) {
+                monster.reset()
+                character.skillPoint++;
+                character.killedCount++;
+                console.log('Skill Point : ' + character.skillPoint)
+            }
+
             this.reset()
         }
     }
@@ -344,7 +350,7 @@ function FireBall() {
 
 function Monster() {
     //monster control
-    var speed = 10
+    var speed = 4
     var hitboxPlayer = 20
     var rangePlayerSpawn = 200
 
@@ -356,7 +362,8 @@ function Monster() {
 
     //monster stats
     tMonster.setSpeed(0);
-    tMonster.monsterHP = ((Math.random() % 25) - 35) + character.characterHP;
+    tMonster.monsterMHP = Math.floor((((Math.random() * 100) % 25) - 35) + character.characterHP);
+    tMonster.monsterHP = this.monsterMHP
     tMonster.monsterATK = Math.floor(this.monsterHP / 10);
 
 
@@ -379,6 +386,9 @@ function Monster() {
             newX = Math.random() * this.cWidth;
             newY = Math.random() * this.cHeight;
             this.setPosition(Math.floor(newX), Math.floor(newY));
+            tMonster.monsterMHP = ((Math.random() % 25) - 35) + character.characterHP;
+            tMonster.monsterHP = this.monsterMHP
+            tMonster.monsterATK = Math.floor(this.monsterHP / 10);
         } while (this.x < character.x + rangePlayerSpawn && this.x > character.x - rangePlayerSpawn && this.y < character.y + rangePlayerSpawn && this.y > character.y - rangePlayerSpawn)
     }
     tMonster.reset();
