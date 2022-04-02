@@ -15,6 +15,7 @@ var character
 var warp;
 var countMon = 2
 var monster = []
+var killedCondition = 2
 
 function init() {
     //game and background
@@ -36,7 +37,7 @@ function init() {
         game.start();
     } else if (state == 2) {
         game = new Scene()
-        background = new Sprite(game, "map_1.png", screenWidth, screenHeight)
+        background = new Sprite(game, "map_2.png", screenWidth, screenHeight)
         background.setSpeed(0, 0)
         background.setPosition(900, 450)
 
@@ -47,6 +48,7 @@ function init() {
         }
 
         //game settings
+        killedCondition += 4
         game.start();
     }
 }
@@ -55,6 +57,24 @@ var created = false
 
 function update() {
     if (state == 1) {
+        //game update
+        game.clear()
+        background.update()
+        if (bgSound) {
+            backgroundSound.play()
+        }
+
+        //entity check
+        entityCheck()
+
+        //character update
+        character.checkKeys()
+        character.update()
+        character.fireball.update()
+        character.fireball.positionCheck()
+
+        document.getElementById("characterStatus").innerHTML = showStats()
+    } else if (state == 2) {
         //game update
         game.clear()
         background.update()
@@ -91,7 +111,7 @@ function entityCheck() {
     }
 
     //check condition to next level
-    if (character.killedCount >= 2) {
+    if (character.killedCount >= killedCondition) {
         warp = new Warp();
         warp.update()
         warp.checkCollision(character)
@@ -130,10 +150,6 @@ showStats = function() {
 
     return status;
 }
-
-
-
-
 
 function Player() {
     //creating character and set position
@@ -261,7 +277,8 @@ function Warp() {
 
         tWarp.checkCollision = function(character) {
             if (this.collidesWith(character)) {
-                window.location.href = "./Stage_2.html";
+                state++
+                window.location.href = "./Stage_2.html"
             }
         }
 
@@ -357,8 +374,13 @@ function Monster() {
     var rangePlayerSpawn = 200
 
     //creating monster
-    var tMonster = new Sprite(game, "Shadow Brute.png", 64, 256);
-    tMonster.loadAnimation(64, 256, 16, 32)
+    if (state == 1) {
+        var tMonster = new Sprite(game, "Shadow Brute.png", 64, 256);
+        tMonster.loadAnimation(64, 256, 16, 32)
+    } else if (state == 2) {
+        var tMonster = new Sprite(game, "Harvey_Beach.png", 64, 128);
+        tMonster.loadAnimation(64, 128, 16, 32)
+    }
     tMonster.generateAnimationCycles()
     tMonster.setAnimationSpeed(500)
 
