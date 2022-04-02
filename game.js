@@ -36,20 +36,27 @@ function init() {
         //game settings
         game.start();
     } else if (state == 2) {
-        game = new Scene()
-        background = new Sprite(game, "map_2.png", screenWidth, screenHeight)
-        background.setSpeed(0, 0)
-        background.setPosition(900, 450)
+        background.changeImage("map_2.png")
+        character.setPosition(440, 380)
 
         //monster and character
-        character = Player()
         for (let i = 0; i < countMon; i++) {
             monster[i] = new Monster()
         }
 
         //game settings
         killedCondition += 4
-        game.start();
+    } else if (state == 3) {
+        background.changeImage("map_3.png")
+        character.setPosition(440, 380)
+
+        //monster and character
+        for (let i = 0; i < countMon; i++) {
+            monster[i] = new Monster()
+        }
+
+        //game settings
+        killedCondition += 4
     }
 }
 
@@ -278,7 +285,9 @@ function Warp() {
         tWarp.checkCollision = function(character) {
             if (this.collidesWith(character)) {
                 state++
-                window.location.href = "./Stage_2.html"
+                killedCondition = 10 + character.killedCount
+                init()
+
             }
         }
 
@@ -290,7 +299,9 @@ function Warp() {
 
         tWarp.checkCollision = function(character) {
             if (this.collidesWith(character)) {
-                window.location.href = "./Stage_3.html";
+                state++
+                killedCondition = 10 + character.killedCount
+                init()
             }
         }
 
