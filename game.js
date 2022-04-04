@@ -18,7 +18,7 @@ var monster = []
 var killedCondition = 2
 
 //debug
-var debug = true
+var debug = false
 
 function init() {
     //game and background
@@ -375,7 +375,7 @@ function Warp() {
         tWarp.setSpeed(0)
 
         tWarp.checkCollision = function(character) {
-            stage = 0;
+            // stage = 0;
             if (this.collidesWith(character)) {
                 console.log('End')
                 window.location.href = "./Endgame.html";
