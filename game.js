@@ -3,7 +3,7 @@ var game
 var background
 var screenWidth = 1800
 var screenHeight = 900
-var state = 3
+var stage = 1
 
 //setting
 var bgSound = false
@@ -22,9 +22,9 @@ var debug = true
 
 function init() {
     //game and background
-    if (state == 1) {
+    if (stage == 1) {
         game = new Scene()
-        background = new Sprite(game, "map_1.png", screenWidth, screenHeight)
+        background = new Sprite(game, "./environment/map_1.png", screenWidth, screenHeight)
         background.setSpeed(0, 0)
         background.setPosition(900, 450)
 
@@ -38,22 +38,39 @@ function init() {
 
         //game settings
         game.start();
-    } else if (state == 2) {
-        background.changeImage("map_2.png")
+    } else if (stage == 2) {
+        if (!debug) {
+            background.changeImage("./environment/map_2.png")
+        } else {
+            game = new Scene()
+            background = new Sprite(game, "./environment/map_2.png", screenWidth, screenHeight)
+            background.setSpeed(0, 0)
+
+            //monster and character
+            character = Player()
+            for (let i = 0; i < countMon; i++) {
+                monster[i] = new Monster()
+            }
+
+            buildSound();
+
+            //game settings
+            game.start();
+        }
+
         character.setPosition(440, 380)
 
         //monster and character
         for (let i = 0; i < countMon; i++) {
             monster[i] = new Monster()
         }
-    } else if (state == 3) {
+    } else if (stage == 3) {
         if (!debug) {
-            background.changeImage("map_3.png")
+            background.changeImage("./environment/map_3.png")
         } else {
             game = new Scene()
-            background = new Sprite(game, "map_3.png", screenWidth, screenHeight)
+            background = new Sprite(game, "./environment/map_3.png", screenWidth, screenHeight)
             background.setSpeed(0, 0)
-            background.setPosition(900, 450)
 
             //monster and character
             character = Player()
@@ -79,7 +96,7 @@ function init() {
 var created = false
 
 function update() {
-    if (state == 1) {
+    if (stage == 1) {
         //game update
         game.clear()
         background.update()
@@ -97,7 +114,7 @@ function update() {
         character.fireball.positionCheck()
 
         document.getElementById("characterStatus").innerHTML = showStats()
-    } else if (state == 2) {
+    } else if (stage == 2) {
         //game update
         game.clear()
         background.update()
@@ -115,7 +132,7 @@ function update() {
         character.fireball.positionCheck()
 
         document.getElementById("characterStatus").innerHTML = showStats()
-    } else if (state == 3) {
+    } else if (stage == 3) {
         //game update
         game.clear()
         background.update()
@@ -203,7 +220,7 @@ showStats = function() {
 
 function Player() {
     //creating character and set position
-    var tCharacter = new Sprite(game, "Carbon Ghost.png", 128, 94)
+    var tCharacter = new Sprite(game, "./entity/player/Carbon Ghost.png", 128, 94)
     tCharacter.setPosition(440, 380)
     tCharacter.setSpeed(0)
 
@@ -323,14 +340,14 @@ function Player() {
 function Warp() {
     var countIncrease = 2
 
-    if (state == 1) {
+    if (stage == 1) {
         var tWarp = new Sprite(game, "./portal.gif", 100, 200)
         tWarp.setPosition(1200, 400)
         tWarp.setSpeed(0)
 
         tWarp.checkCollision = function(character) {
             if (this.collidesWith(character)) {
-                state++
+                stage++
                 killedCondition = countIncrease + character.killedCount
                 init()
 
@@ -338,27 +355,27 @@ function Warp() {
         }
         return tWarp
 
-    } else if (state == 2) {
+    } else if (stage == 2) {
         var tWarp = new Sprite(game, "./portal.gif", 100, 200)
         tWarp.setPosition(1200, 400)
         tWarp.setSpeed(0)
 
         tWarp.checkCollision = function(character) {
             if (this.collidesWith(character)) {
-                state++
+                stage++
                 killedCondition = countIncrease + character.killedCount
                 init()
             }
         }
         return tWarp
 
-    } else if (state == 3) {
+    } else if (stage == 3) {
         var tWarp = new Sprite(game, "./portal.gif", 100, 200)
         tWarp.setPosition(1200, 400)
         tWarp.setSpeed(0)
 
         tWarp.checkCollision = function(character) {
-            state = 0;
+            stage = 0;
             if (this.collidesWith(character)) {
                 console.log('End')
                 window.location.href = "./Endgame.html";
@@ -372,7 +389,7 @@ function Warp() {
 function FireBall() {
     var fireballAvailable = true
     var fireballShown = false
-    var sFireball = new Sprite(game, "./element/fire_ball.png", 30, 20)
+    var sFireball = new Sprite(game, "./entity/player/fire_ball.png", 30, 20)
     sFireball.hide()
 
     // [x, y]
@@ -445,14 +462,14 @@ function Monster() {
     var rangePlayerSpawn = 200
 
     //creating monster
-    if (state == 1) {
-        var tMonster = new Sprite(game, "Shadow Brute.png", 64, 256)
+    if (stage == 1) {
+        var tMonster = new Sprite(game, "./entity/monsters/Shadow_Brute.png", 64, 256)
         tMonster.loadAnimation(64, 256, 16, 32)
-    } else if (state == 2) {
-        var tMonster = new Sprite(game, "Harvey_Beach.png", 64, 128)
+    } else if (stage == 2) {
+        var tMonster = new Sprite(game, "./entity/monsters/Harvey_Beach.png", 64, 128)
         tMonster.loadAnimation(64, 128, 16, 32)
-    } else if (state == 3) {
-        var tMonster = new Sprite(game, "Angry Roger.png", 127, 127)
+    } else if (stage == 3) {
+        var tMonster = new Sprite(game, "./entity/monsters/Angry_Roger.png", 127, 127)
         tMonster.loadAnimation(127, 127, 31.75, 31.75)
     }
     tMonster.generateAnimationCycles()
