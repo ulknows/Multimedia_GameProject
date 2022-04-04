@@ -329,6 +329,9 @@ function FireBall() {
     var sFireball = new Sprite(game, "./element/fire_ball.png", 30, 20)
     sFireball.hide()
 
+    // [x, y]
+    var lastFireAxis = [0, 0]
+
     sFireball.getAvailable = function() {
         return fireballAvailable
     }
@@ -336,6 +339,7 @@ function FireBall() {
     sFireball.fire = function() {
         this.show()
         fireballShown = true
+        lastFireAxis = [character.x, character.y]
 
         this.setSpeed(15)
         this.setBoundAction(DIE)
@@ -358,7 +362,7 @@ function FireBall() {
     }
 
     sFireball.positionCheck = function() {
-        if (sFireball.x < 0 || sFireball.x > 1440 || sFireball.y < 0 || sFireball.y > 900 || !fireballShown) {
+        if (sFireball.x < 0 || sFireball.x > 1440 || sFireball.y < 0 || sFireball.y > 900 || !fireballShown || (Math.abs(lastFireAxis[0] - sFireball.x) >= 300) || (Math.abs(lastFireAxis[1] - sFireball.y) >= 300)) {
             fireballAvailable = true
         } else {
             fireballAvailable = false
