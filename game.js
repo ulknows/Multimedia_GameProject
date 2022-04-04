@@ -154,9 +154,9 @@ function update() {
 }
 
 function buildSound() {
-    fireballSound = new Sound("fireball.mp3")
-    flySound = new Sound("b_fly.wav")
-    backgroundSound = new Sound("videoplayback_1.mp4")
+    fireballSound = new Sound("./sound/fireball.mp3")
+    flySound = new Sound("./sound/b_fly.wav")
+    backgroundSound = new Sound("./sound/videoplayback_1.mp4")
 }
 
 function entityCheck() {
@@ -341,7 +341,7 @@ function Warp() {
     var countIncrease = 2
 
     if (stage == 1) {
-        var tWarp = new Sprite(game, "./portal.gif", 100, 200)
+        var tWarp = new Sprite(game, "./environment/portal.gif", 100, 200)
         tWarp.setPosition(1200, 400)
         tWarp.setSpeed(0)
 
@@ -356,7 +356,7 @@ function Warp() {
         return tWarp
 
     } else if (stage == 2) {
-        var tWarp = new Sprite(game, "./portal.gif", 100, 200)
+        var tWarp = new Sprite(game, "./environment/portal.gif", 100, 200)
         tWarp.setPosition(1200, 400)
         tWarp.setSpeed(0)
 
@@ -370,7 +370,7 @@ function Warp() {
         return tWarp
 
     } else if (stage == 3) {
-        var tWarp = new Sprite(game, "./portal.gif", 100, 200)
+        var tWarp = new Sprite(game, "./environment/portal.gif", 100, 200)
         tWarp.setPosition(1200, 400)
         tWarp.setSpeed(0)
 
