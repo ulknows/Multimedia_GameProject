@@ -18,7 +18,7 @@ var monster = []
 var killedCondition = 2
 var boss;
 var cooldown = 0
-var maxCooldown = 150
+var maxCooldown = 100
 var missile;
 
 //debug
@@ -94,7 +94,7 @@ function init() {
         for (let i = 0; i < countMon; i++) {
             monster[i] = new Monster()
         }
-
+        missile = new Missile();
     }
 }
 
@@ -160,6 +160,7 @@ function update() {
             boss.wriggle()
             boss.update()
             missile.update();
+            
         }
     }
 }
@@ -169,7 +170,7 @@ function buildSound() {
     flySound = new Sound("./sound/b_fly.wav")
     backgroundSound = new Sound("./sound/videoplayback_1.mp4")
 }
-
+var spawnboss = false;
 function entityCheck() {
     //monster movement and collision check
     for (let i = 0; i < countMon; i++) {
@@ -179,9 +180,8 @@ function entityCheck() {
         character.fireball.checkCollision(monster[i])
     }
 
-    if(character.killedCount >= killedCondition && stage == 3){
+    if(character.killedCount >= killedCondition && stage == 3 && spawnboss == false){
         boss = new Boss();
-        missile = new Missile();
     }
 
     //check condition to next level
@@ -516,19 +516,20 @@ function Boss(){
 }
 
 function Missile(){
-    tMissile = new Sprite(game, "./entity/monsters/missile.png", 60, 40);
+    tMissile = new Sprite(game, "./entity/monsters/missile.png", 240, 160);
     tMissile.hide();
     tMissile.reset = function(){
         this.setPosition(boss.x,boss.y);
         this.hide();
     }
     tMissile.fire = function(){
-        console.log('fire!!!')
+        
         this.show();
+        console.log('show')
         this.setSpeed(15);
         this.setBoundAction(DIE);
         this.setPosition(boss.x, boss.y);
-        this.setAngle(180);
+        this.setAngle(270);
         this.setSpeed(15);
     } // end fire
     
