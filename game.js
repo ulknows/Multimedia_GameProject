@@ -127,6 +127,15 @@ function entityCheck() {
 
 showStats = function() {
     var status = "<table><th><strong>Character</strong></th><th></th>"
+
+    status += "<tr><td>Fireball : "
+    if (character.fireball.getAvailable()) {
+        status += "Available"
+    } else {
+        status += "Cooldown"
+    }
+    status += "</td></tr>"
+
     if (character.skillPoint > 0) {
         status += "<tr><td>Skillpoint : " + character.skillPoint + "<td></tr><tr></tr>"
     }
