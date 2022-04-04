@@ -16,6 +16,10 @@ var warp;
 var countMon = 2
 var monster = []
 var killedCondition = 2
+var boss;
+var cooldown = 0
+var maxCooldown = 150
+var missile;
 
 //debug
 var debug = false
@@ -90,6 +94,7 @@ function init() {
         for (let i = 0; i < countMon; i++) {
             monster[i] = new Monster()
         }
+
     }
 }
 
@@ -150,6 +155,12 @@ function update() {
         character.fireball.positionCheck()
 
         document.getElementById("characterStatus").innerHTML = showStats()
+
+        if(character.killedCount >= killedCondition){
+            boss.wriggle()
+            boss.update()
+            missile.update();
+        }
     }
 }
 
@@ -168,11 +179,17 @@ function entityCheck() {
         character.fireball.checkCollision(monster[i])
     }
 
+    if(character.killedCount >= killedCondition && stage == 3){
+        boss = new Boss();
+        missile = new Missile();
+    }
+
     //check condition to next level
-    if (character.killedCount >= killedCondition) {
+    else if (character.killedCount >= killedCondition) {
         warp = new Warp();
         warp.update()
         warp.checkCollision(character)
+        
     }
 }
 
@@ -229,11 +246,11 @@ function Player() {
     tCharacter.angleCharacter = "down"
 
     //setting status of character
-    tCharacter.characterHP = 100
-    tCharacter.characterMHP = 100
-    tCharacter.characterATK = 50
-    tCharacter.characterDEF = 50
-    tCharacter.characterSPD = 100
+    tCharacter.characterHP = 900    //default = 100
+    tCharacter.characterMHP = 900   //default = 100
+    tCharacter.characterATK = 900    //default = 50
+    tCharacter.characterDEF = 900    //default = 50
+    tCharacter.characterSPD = 900 //default = 100
     tCharacter.skillPoint = 0
     tCharacter.killedCount = 0;
 
@@ -453,6 +470,69 @@ function FireBall() {
     }
 
     return sFireball
+}
+var lastx = 1300
+var lasty = 450
+function Boss(){
+    
+    
+    var tBoss = new Sprite(game,'./entity/monsters/FBoss.gif',192,224)
+    tBoss.show()
+    tBoss.setPosition(lastx,lasty)
+    tBoss.setSpeed(0)
+    tBoss.monsterHP = 1000
+    console.log(cooldown)
+    tBoss.wriggle = function(){
+        if(cooldown >= maxCooldown){
+            var atkType = parseInt(Math.random()*100)%3
+            console.log("atkType: "+ atkType)
+            if(atkType == 0){
+                console.log('insite 0')
+                tBoss.setPosition(1300,150)
+                lastx = 1300
+                lasty = 150
+                missile.fire()
+                cooldown = 0;
+            }else if (atkType == 1){
+                console.log('insite 1')
+                tBoss.setPosition(1300,450)
+                lastx = 1300
+                lasty = 450
+                missile.fire()
+                cooldown =0;
+            }else if (atkType == 2){
+                console.log('insite 2')
+                tBoss.setPosition(1300,750)
+                lastx = 1300
+                lasty = 750
+                missile.fire()
+                cooldown = 0;
+            }
+        }else{
+            cooldown++
+        } 
+    }
+    return tBoss
+}
+
+function Missile(){
+    tMissile = new Sprite(game, "./entity/monsters/missile.png", 60, 40);
+    tMissile.hide();
+    tMissile.reset = function(){
+        this.setPosition(boss.x,boss.y);
+        this.hide();
+    }
+    tMissile.fire = function(){
+        console.log('fire!!!')
+        this.show();
+        this.setSpeed(15);
+        this.setBoundAction(DIE);
+        this.setPosition(boss.x, boss.y);
+        this.setAngle(180);
+        this.setSpeed(15);
+    } // end fire
+    
+    return tMissile;
 }
 
 function Monster() {
