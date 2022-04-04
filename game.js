@@ -3,7 +3,7 @@ var game
 var background
 var screenWidth = 1800
 var screenHeight = 900
-var state = 1
+var state = 3
 
 //setting
 var bgSound = false
@@ -16,6 +16,9 @@ var warp;
 var countMon = 2
 var monster = []
 var killedCondition = 2
+
+//debug
+var debug = true
 
 function init() {
     //game and background
@@ -43,20 +46,33 @@ function init() {
         for (let i = 0; i < countMon; i++) {
             monster[i] = new Monster()
         }
-
-        //game settings
-        killedCondition += 4
     } else if (state == 3) {
-        background.changeImage("map_3.png")
+        if (!debug) {
+            background.changeImage("map_3.png")
+        } else {
+            game = new Scene()
+            background = new Sprite(game, "map_3.png", screenWidth, screenHeight)
+            background.setSpeed(0, 0)
+            background.setPosition(900, 450)
+
+            //monster and character
+            character = Player()
+            for (let i = 0; i < countMon; i++) {
+                monster[i] = new Monster()
+            }
+
+            buildSound();
+
+            //game settings
+            game.start();
+        }
+
         character.setPosition(440, 380)
 
         //monster and character
         for (let i = 0; i < countMon; i++) {
             monster[i] = new Monster()
         }
-
-        //game settings
-        killedCondition += 4
     }
 }
 
@@ -82,6 +98,24 @@ function update() {
 
         document.getElementById("characterStatus").innerHTML = showStats()
     } else if (state == 2) {
+        //game update
+        game.clear()
+        background.update()
+        if (bgSound) {
+            backgroundSound.play()
+        }
+
+        //entity check
+        entityCheck()
+
+        //character update
+        character.checkKeys()
+        character.update()
+        character.fireball.update()
+        character.fireball.positionCheck()
+
+        document.getElementById("characterStatus").innerHTML = showStats()
+    } else if (state == 3) {
         //game update
         game.clear()
         background.update()
@@ -287,6 +321,8 @@ function Player() {
 }
 
 function Warp() {
+    var countIncrease = 2
+
     if (state == 1) {
         var tWarp = new Sprite(game, "./portal.gif", 100, 200)
         tWarp.setPosition(1200, 400)
@@ -295,13 +331,13 @@ function Warp() {
         tWarp.checkCollision = function(character) {
             if (this.collidesWith(character)) {
                 state++
-                killedCondition = 10 + character.killedCount
+                killedCondition = countIncrease + character.killedCount
                 init()
 
             }
         }
-
         return tWarp
+
     } else if (state == 2) {
         var tWarp = new Sprite(game, "./portal.gif", 100, 200)
         tWarp.setPosition(1200, 400)
@@ -310,17 +346,27 @@ function Warp() {
         tWarp.checkCollision = function(character) {
             if (this.collidesWith(character)) {
                 state++
-                killedCondition = 10 + character.killedCount
+                killedCondition = countIncrease + character.killedCount
                 init()
             }
         }
-
         return tWarp
-    } else {
 
+    } else if (state == 3) {
+        var tWarp = new Sprite(game, "./portal.gif", 100, 200)
+        tWarp.setPosition(1200, 400)
+        tWarp.setSpeed(0)
 
+        tWarp.checkCollision = function(character) {
+            state = 0;
+            if (this.collidesWith(character)) {
+                console.log('End')
+                window.location.href = "./Endgame.html";
+            }
+        }
         return tWarp
     }
+
 }
 
 function FireBall() {
@@ -400,11 +446,14 @@ function Monster() {
 
     //creating monster
     if (state == 1) {
-        var tMonster = new Sprite(game, "Shadow Brute.png", 64, 256);
+        var tMonster = new Sprite(game, "Shadow Brute.png", 64, 256)
         tMonster.loadAnimation(64, 256, 16, 32)
     } else if (state == 2) {
-        var tMonster = new Sprite(game, "Harvey_Beach.png", 64, 128);
+        var tMonster = new Sprite(game, "Harvey_Beach.png", 64, 128)
         tMonster.loadAnimation(64, 128, 16, 32)
+    } else if (state == 3) {
+        var tMonster = new Sprite(game, "Angry Roger.png", 127, 127)
+        tMonster.loadAnimation(127, 127, 31.75, 31.75)
     }
     tMonster.generateAnimationCycles()
     tMonster.setAnimationSpeed(500)
