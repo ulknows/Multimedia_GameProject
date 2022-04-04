@@ -190,7 +190,7 @@ function Player() {
         if (keysDown[K_LEFT]) {
             angleCharacter = 'left'
             tCharacter.playAnimation()
-            tCharacter.changeXby(characterMovementSpeed)
+            tCharacter.changeXby(0 - characterMovementSpeed)
             tCharacter.setMoveAngle(270)
             tCharacter.setCurrentCycle("left")
         }
@@ -204,7 +204,7 @@ function Player() {
         if (keysDown[K_UP]) {
             angleCharacter = 'up'
             tCharacter.playAnimation()
-            tCharacter.changeYby(characterMovementSpeed)
+            tCharacter.changeYby(0 - characterMovementSpeed)
             tCharacter.setMoveAngle(0)
             tCharacter.setCurrentCycle("up")
         }
