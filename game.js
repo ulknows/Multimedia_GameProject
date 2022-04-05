@@ -15,14 +15,21 @@ var character
 var warp;
 var countMon = 2
 var monster = []
-var killedCondition = 2
+var killedCondition = 0
 var boss;
 var cooldown = 0
 var maxCooldown = 100
 var missile;
 
 //debug
-var debug = false
+var debug = true
+var killedDebug = 0
+var startStage = 3
+
+if (debug) {
+    killedCondition = killedDebug
+    stage = 3
+}
 
 function init() {
     //game and background
@@ -101,14 +108,13 @@ function init() {
 var created = false
 
 function update() {
+    //game update
+    game.clear()
+    background.update()
+    if (bgSound) {
+        backgroundSound.play()
+    }
     if (stage == 1) {
-        //game update
-        game.clear()
-        background.update()
-        if (bgSound) {
-            backgroundSound.play()
-        }
-
         //entity check
         entityCheck()
 
@@ -120,13 +126,6 @@ function update() {
 
         document.getElementById("characterStatus").innerHTML = showStats()
     } else if (stage == 2) {
-        //game update
-        game.clear()
-        background.update()
-        if (bgSound) {
-            backgroundSound.play()
-        }
-
         //entity check
         entityCheck()
 
@@ -138,11 +137,9 @@ function update() {
 
         document.getElementById("characterStatus").innerHTML = showStats()
     } else if (stage == 3) {
-        //game update
-        game.clear()
-        background.update()
-        if (bgSound) {
-            backgroundSound.play()
+        if (character.killedCount >= killedCondition && spawnboss == false) {
+            boss = new Boss();
+            spawnboss = true
         }
 
         //entity check
@@ -156,11 +153,11 @@ function update() {
 
         document.getElementById("characterStatus").innerHTML = showStats()
 
-        if(character.killedCount >= killedCondition){
+        if (character.killedCount >= killedCondition) {
             boss.wriggle()
             boss.update()
             missile.update();
-            
+
         }
     }
 }
@@ -171,25 +168,29 @@ function buildSound() {
     backgroundSound = new Sound("./sound/videoplayback_1.mp4")
 }
 var spawnboss = false;
+
 function entityCheck() {
     //monster movement and collision check
     for (let i = 0; i < countMon; i++) {
         monster[i].wriggle()
         monster[i].update()
-        character.checkCollision(monster[i])
-        character.fireball.checkCollision(monster[i])
+        character.checkCollision(monster[i], 'monster')
+        character.fireball.checkCollision(monster[i], 'monster')
     }
 
-    if(character.killedCount >= killedCondition && stage == 3 && spawnboss == false){
-        boss = new Boss();
+    if (stage == 3) {
+        character.checkCollision(boss, 'boss')
+        character.fireball.checkCollision(boss, 'boss')
     }
+
+
 
     //check condition to next level
     else if (character.killedCount >= killedCondition) {
         warp = new Warp();
         warp.update()
         warp.checkCollision(character)
-        
+
     }
 }
 
@@ -246,10 +247,10 @@ function Player() {
     tCharacter.angleCharacter = "down"
 
     //setting status of character
-    tCharacter.characterHP = 900    //default = 100
-    tCharacter.characterMHP = 900   //default = 100
-    tCharacter.characterATK = 900    //default = 50
-    tCharacter.characterDEF = 900    //default = 50
+    tCharacter.characterHP = 900 //default = 100
+    tCharacter.characterMHP = 900 //default = 100
+    tCharacter.characterATK = 900 //default = 50
+    tCharacter.characterDEF = 900 //default = 50
     tCharacter.characterSPD = 900 //default = 100
     tCharacter.skillPoint = 0
     tCharacter.killedCount = 0;
@@ -338,21 +339,25 @@ function Player() {
         }
     }
 
-    tCharacter.checkCollision = function(monster) {
-        if (monster.collidesWith(this)) {
-            this.characterHP -= monster.monsterATK;
-            console.log("player hp : " + this.characterHP + ' / ' + this.characterMHP)
-            if (this.characterHP <= 0) {
-                game.stop()
+    tCharacter.checkCollision = function(enemies, type) {
+        if (type == 'monster') {
+            if (enemies.collidesWith(this)) {
+                this.characterHP -= enemies.monsterATK;
+                console.log("player hp : " + this.characterHP + ' / ' + this.characterMHP)
+                if (this.characterHP <= 0) {
+                    game.stop()
+                }
+                enemies.reset()
+                character.skillPoint++;
+                character.killedCount++;
             }
-            monster.reset()
-            character.skillPoint++;
-            character.killedCount++;
+        } else if (type == 'boss') {
+            if (boss.collidesWith(this)) {
+                this.characterHP -= boss.bossATK
+                console.log("player hp : " + this.characterHP + ' / ' + this.characterMHP)
+            }
         }
-        if(Missile.collidesWith(this)){
-            this.characterHP -= boss.bossATK
-console.log("player hp : " + this.characterHP + ' / ' + this.characterMHP)
-        }
+
     }
 
     return tCharacter
@@ -453,19 +458,30 @@ function FireBall() {
         }
     }
 
-    sFireball.checkCollision = function(monster) {
-        if (monster.collidesWith(this)) {
+    sFireball.checkCollision = function(enemies, type) {
+        if (type == 'monster') {
+            if (enemies.collidesWith(this)) {
+                enemies.monsterHP -= character.characterATK
+                console.log('monster : ' + enemies.monsterHP + '/' + enemies.monsterMHP)
+                if (enemies.monsterHP <= 0) {
+                    enemies.reset()
+                    character.skillPoint++;
+                    character.killedCount++;
+                    console.log('Skill Point : ' + character.skillPoint)
+                }
 
-            monster.monsterHP -= character.characterATK
-            console.log(monster.monsterHP + '/' + monster.monsterMHP)
-            if (monster.monsterHP <= 0) {
-                monster.reset()
-                character.skillPoint++;
-                character.killedCount++;
-                console.log('Skill Point : ' + character.skillPoint)
+                this.reset()
             }
+        } else if (type == 'boss') {
+            if (boss.collidesWith(this)) {
+                boss.bossHP -= character.characterATK
+                console.log('boss : ' + boss.bossHP + ' / ' + boss.bossMHP)
+                if (boss.bossHP <= 0) {
+                    boss.killed()
+                }
 
-            this.reset()
+                this.reset()
+            }
         }
     }
     sFireball.reset = function() {
@@ -477,72 +493,75 @@ function FireBall() {
 }
 var lastx = 1300
 var lasty = 450
-function Boss(){
-    
-    var tBoss = new Sprite(game,'./entity/monsters/FBoss.gif',192,224)
+
+function Boss() {
+
+    var tBoss = new Sprite(game, './entity/monsters/FBoss.gif', 192, 224)
     tBoss.show()
-    tBoss.setPosition(lastx,lasty)
+    tBoss.setPosition(lastx, lasty)
     tBoss.setSpeed(0)
     tBoss.monsterHP = 1000
-    console.log(cooldown)
 
     //stats
     tBoss.bossMHP = 1000
-    tBoss.bossHP = this.bossMHP
+    tBoss.bossHP = tBoss.bossMHP
     tBoss.bossATK = 50
 
-    tBoss.wriggle = function(){
-        if(cooldown >= maxCooldown){
-            var atkType = parseInt(Math.random()*100)%3
-            console.log("atkType: "+ atkType)
-            if(atkType == 0){
+    tBoss.wriggle = function() {
+        if (cooldown >= maxCooldown) {
+            var atkType = parseInt(Math.random() * 100) % 3
+            console.log("atkType: " + atkType)
+            if (atkType == 0) {
                 console.log('insite 0')
-                tBoss.setPosition(1300,150)
+                tBoss.setPosition(1300, 150)
                 lastx = 1300
                 lasty = 150
                 missile.fire()
                 cooldown = 0;
-            }else if (atkType == 1){
+            } else if (atkType == 1) {
                 console.log('insite 1')
-                tBoss.setPosition(1300,450)
+                tBoss.setPosition(1300, 450)
                 lastx = 1300
                 lasty = 450
                 missile.fire()
-                cooldown =0;
-            }else if (atkType == 2){
+                cooldown = 0;
+            } else if (atkType == 2) {
                 console.log('insite 2')
-                tBoss.setPosition(1300,750)
+                tBoss.setPosition(1300, 750)
                 lastx = 1300
                 lasty = 750
                 missile.fire()
                 cooldown = 0;
             }
-        }else{
+        } else {
             cooldown++
-        } 
+        }
+    }
+
+    tBoss.killed = function() {
+        tBoss.hide()
     }
     return tBoss
 }
 
-function Missile(){
+function Missile() {
     //Boss fire
     tMissile = new Sprite(game, "./entity/monsters/missile.png", 240, 160);
     tMissile.hide();
-    tMissile.reset = function(){
-        this.setPosition(boss.x,boss.y);
+    tMissile.reset = function() {
+        this.setPosition(boss.x, boss.y);
         this.hide();
     }
 
-    tMissile.fire = function(){
+    tMissile.fire = function() {
         this.show();
-        console.log('show')
         this.setSpeed(15);
         this.setBoundAction(DIE);
         this.setPosition(boss.x, boss.y);
         this.setAngle(270);
         this.setSpeed(15);
     }
-    
+
     return tMissile;
 }
 
