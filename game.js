@@ -114,52 +114,30 @@ function update() {
     if (bgSound) {
         backgroundSound.play()
     }
-    if (stage == 1) {
-        //entity check
-        entityCheck()
 
-        //character update
-        character.checkKeys()
-        character.update()
-        character.fireball.update()
-        character.fireball.positionCheck()
+    //character update
+    character.checkKeys()
+    character.update()
+    character.fireball.update()
+    character.fireball.positionCheck()
 
-        document.getElementById("characterStatus").innerHTML = showStats()
-    } else if (stage == 2) {
-        //entity check
-        entityCheck()
-
-        //character update
-        character.checkKeys()
-        character.update()
-        character.fireball.update()
-        character.fireball.positionCheck()
-
-        document.getElementById("characterStatus").innerHTML = showStats()
-    } else if (stage == 3) {
+    if (stage == 3) {
         if (character.killedCount >= killedCondition && spawnboss == false) {
             boss = new Boss();
             spawnboss = true
         }
 
-        //entity check
-        entityCheck()
-
-        //character update
-        character.checkKeys()
-        character.update()
-        character.fireball.update()
-        character.fireball.positionCheck()
-
-        document.getElementById("characterStatus").innerHTML = showStats()
-
         if (character.killedCount >= killedCondition) {
             boss.wriggle()
             boss.update()
             missile.update();
-
         }
     }
+
+    //entity check
+    entityCheck()
+
+    document.getElementById("characterStatus").innerHTML = showPlayerStats()
 }
 
 function buildSound() {
@@ -183,19 +161,58 @@ function entityCheck() {
         character.fireball.checkCollision(boss, 'boss')
     }
 
-
-
     //check condition to next level
     else if (character.killedCount >= killedCondition) {
         warp = new Warp();
         warp.update()
         warp.checkCollision(character)
-
     }
 }
 
-showStats = function() {
+showPlayerStats = function() {
     var status = "<table><th><strong>Character</strong></th><th></th>"
+
+    status += "<tr><td>Fireball : "
+    if (character.fireball.getAvailable()) {
+        status += "Available"
+    } else {
+        status += "Cooldown"
+    }
+    status += "</td></tr>"
+
+    if (character.skillPoint > 0) {
+        status += "<tr><td>Skillpoint : " + character.skillPoint + "<td></tr><tr></tr>"
+    }
+
+    status += "<tr><td>HP: " + character.characterHP + "/" + character.characterMHP + "</td><td>";
+    if (character.skillPoint > 0) {
+        status += "<button id=\"upgradeHP\">Press (A) to upgrade</button>"
+    }
+    status += "</td></tr>"
+
+    status += "<tr><td>damage : " + character.characterATK + "</td><td>";
+    if (character.skillPoint > 0) {
+        status += "<button id=\"upgradeATK\">Press (S) to upgrade</button>"
+    }
+    status += "</td></tr>"
+
+    status += "<tr><td>defend : " + character.characterDEF + "</td><td>";
+    if (character.skillPoint > 0) {
+        status += "<button id=\"upgradeDEF\">Press (D) to upgrade</button>"
+    }
+    status += "</td></tr>"
+
+    status += "<tr><td>speed: " + character.characterSPD + "</td><td>";
+    if (character.skillPoint > 0) {
+        status += "<button id=\"upgradeSPD\">Press (F) to upgrade</button>"
+    }
+    status += "</td></tr>"
+
+    return status;
+}
+
+showEntityStats = function(type) {
+    var status = "<table><th><strong>" + type + "</strong></th><th></th>"
 
     status += "<tr><td>Fireball : "
     if (character.fireball.getAvailable()) {
