@@ -341,13 +341,17 @@ function Player() {
     tCharacter.checkCollision = function(monster) {
         if (monster.collidesWith(this)) {
             this.characterHP -= monster.monsterATK;
-            console.log(this.characterHP + ' / ' + this.characterMHP)
+            console.log("player hp : " + this.characterHP + ' / ' + this.characterMHP)
             if (this.characterHP <= 0) {
                 game.stop()
             }
             monster.reset()
             character.skillPoint++;
             character.killedCount++;
+        }
+        if(Missile.collidesWith(this)){
+            this.characterHP -= boss.bossATK
+console.log("player hp : " + this.characterHP + ' / ' + this.characterMHP)
         }
     }
 
@@ -475,13 +479,18 @@ var lastx = 1300
 var lasty = 450
 function Boss(){
     
-    
     var tBoss = new Sprite(game,'./entity/monsters/FBoss.gif',192,224)
     tBoss.show()
     tBoss.setPosition(lastx,lasty)
     tBoss.setSpeed(0)
     tBoss.monsterHP = 1000
     console.log(cooldown)
+
+    //stats
+    tBoss.bossMHP = 1000
+    tBoss.bossHP = this.bossMHP
+    tBoss.bossATK = 50
+
     tBoss.wriggle = function(){
         if(cooldown >= maxCooldown){
             var atkType = parseInt(Math.random()*100)%3
@@ -516,14 +525,15 @@ function Boss(){
 }
 
 function Missile(){
+    //Boss fire
     tMissile = new Sprite(game, "./entity/monsters/missile.png", 240, 160);
     tMissile.hide();
     tMissile.reset = function(){
         this.setPosition(boss.x,boss.y);
         this.hide();
     }
+
     tMissile.fire = function(){
-        
         this.show();
         console.log('show')
         this.setSpeed(15);
@@ -531,7 +541,7 @@ function Missile(){
         this.setPosition(boss.x, boss.y);
         this.setAngle(270);
         this.setSpeed(15);
-    } // end fire
+    }
     
     return tMissile;
 }
