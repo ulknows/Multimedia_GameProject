@@ -9,6 +9,17 @@
     background-color: white;
 }
 
+#monsterStatus {
+    position: absolute;
+    left: 30px;
+    top: 250px;
+    width: fit-content;
+    border: solid black 2px;
+    padding: .25em;
+    z-index: 999;
+    background-color: white;
+}
+
 #orcStatus {
     position: absolute;
     left: 600px;

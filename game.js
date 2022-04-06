@@ -22,7 +22,7 @@ var maxCooldown = 100
 var missile;
 
 //debug
-var debug = true
+var debug = false
 var killedDebug = 0
 var startStage = 3
 
@@ -138,6 +138,7 @@ function update() {
     entityCheck()
 
     document.getElementById("characterStatus").innerHTML = showPlayerStats()
+    document.getElementById("monsterStatus").innerHTML = showEntityStats()
 }
 
 function buildSound() {
@@ -211,46 +212,18 @@ showPlayerStats = function() {
     return status;
 }
 
-showEntityStats = function(type) {
-    var status = "<table><th><strong>" + type + "</strong></th><th></th>"
+showEntityStats = function() {
+    var monsStatus
 
-    status += "<tr><td>Fireball : "
-    if (character.fireball.getAvailable()) {
-        status += "Available"
-    } else {
-        status += "Cooldown"
-    }
-    status += "</td></tr>"
+    for (let i = 0; i < monster.length; i++) {
+        monsStatus += "<table><th><strong> Monster </strong></th>"
 
-    if (character.skillPoint > 0) {
-        status += "<tr><td>Skillpoint : " + character.skillPoint + "<td></tr><tr></tr>"
+        monsStatus += "<tr><td>HP: " + parseInt(monster[i].monsterHP) + "/" + parseInt(monster[i].monsterMHP) + "</td></tr>"
+
+        monsStatus += "<tr><td>damage : " + monster[i].monsterATK + "</td></tr></table><br>";
     }
 
-    status += "<tr><td>HP: " + character.characterHP + "/" + character.characterMHP + "</td><td>";
-    if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeHP\">Press (A) to upgrade</button>"
-    }
-    status += "</td></tr>"
-
-    status += "<tr><td>damage : " + character.characterATK + "</td><td>";
-    if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeATK\">Press (S) to upgrade</button>"
-    }
-    status += "</td></tr>"
-
-    status += "<tr><td>defend : " + character.characterDEF + "</td><td>";
-    if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeDEF\">Press (D) to upgrade</button>"
-    }
-    status += "</td></tr>"
-
-    status += "<tr><td>speed: " + character.characterSPD + "</td><td>";
-    if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeSPD\">Press (F) to upgrade</button>"
-    }
-    status += "</td></tr>"
-
-    return status;
+    return monsStatus;
 }
 
 function Player() {
@@ -369,10 +342,13 @@ function Player() {
                 character.killedCount++;
             }
         } else if (type == 'boss') {
-            if (boss.collidesWith(this)) {
-                this.characterHP -= boss.bossATK
-                console.log("player hp : " + this.characterHP + ' / ' + this.characterMHP)
+            if (spawnboss) {
+                if (boss.collidesWith(this)) {
+                    this.characterHP -= boss.bossATK
+                    console.log("player hp : " + this.characterHP + ' / ' + this.characterMHP)
+                }
             }
+
         }
 
     }
@@ -479,7 +455,6 @@ function FireBall() {
         if (type == 'monster') {
             if (enemies.collidesWith(this)) {
                 enemies.monsterHP -= character.characterATK
-                console.log('monster : ' + enemies.monsterHP + '/' + enemies.monsterMHP)
                 if (enemies.monsterHP <= 0) {
                     enemies.reset()
                     character.skillPoint++;
@@ -490,15 +465,18 @@ function FireBall() {
                 this.reset()
             }
         } else if (type == 'boss') {
-            if (boss.collidesWith(this)) {
-                boss.bossHP -= character.characterATK
-                console.log('boss : ' + boss.bossHP + ' / ' + boss.bossMHP)
-                if (boss.bossHP <= 0) {
-                    boss.killed()
-                }
+            if (spawnboss) {
+                if (boss.collidesWith(this)) {
+                    boss.bossHP -= character.characterATK
+                    console.log('boss : ' + boss.bossHP + ' / ' + boss.bossMHP)
+                    if (boss.bossHP <= 0) {
+                        boss.killed()
+                    }
 
-                this.reset()
+                    this.reset()
+                }
             }
+
         }
     }
     sFireball.reset = function() {
@@ -579,6 +557,15 @@ function Missile() {
         this.setSpeed(15);
     }
 
+    tMissile.checkCollision = function() {
+        if (character.collidesWith(this)) {
+            character.characterHP -= boss.bossATK
+            if (character.characterHP <= 0) {
+                game.stop()
+            }
+        }
+    }
+
     return tMissile;
 }
 
@@ -604,9 +591,11 @@ function Monster() {
 
     //monster stats
     tMonster.setSpeed(0);
-    tMonster.monsterMHP = Math.floor((((Math.random() * 100) % 25) - 35) + character.characterMHP);
+    tMonster.level = 1
+    tMonster.monsterMHP = parseInt(Math.floor(100 * (this.level * 1.3)));
     tMonster.monsterHP = this.monsterMHP
     tMonster.monsterATK = Math.floor(this.monsterHP / 10);
+
 
 
     tMonster.wriggle = function() {
