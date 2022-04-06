@@ -134,6 +134,10 @@ function update() {
         }
     }
 
+    if (spawnboss) {
+        missile.checkCollision()
+    }
+
     //entity check
     entityCheck()
 
@@ -213,7 +217,7 @@ showPlayerStats = function() {
 }
 
 showEntityStats = function() {
-    var monsStatus
+    var monsStatus = ""
 
     for (let i = 0; i < monster.length; i++) {
         monsStatus += "<table><th><strong> Monster </strong></th>"
@@ -221,6 +225,14 @@ showEntityStats = function() {
         monsStatus += "<tr><td>HP: " + parseInt(monster[i].monsterHP) + "/" + parseInt(monster[i].monsterMHP) + "</td></tr>"
 
         monsStatus += "<tr><td>damage : " + monster[i].monsterATK + "</td></tr></table><br>";
+    }
+
+    if (spawnboss) {
+        monsStatus += "<table><th><strong> Boss </strong></th>"
+
+        monsStatus += "<tr><td>HP: " + parseInt(boss.bossHP) + "/" + parseInt(boss.bossMHP) + "</td></tr>"
+
+        monsStatus += "<tr><td>damage : " + boss.bossATK + "</td></tr></table><br>";
     }
 
     return monsStatus;
@@ -333,7 +345,6 @@ function Player() {
         if (type == 'monster') {
             if (enemies.collidesWith(this)) {
                 this.characterHP -= enemies.monsterATK;
-                console.log("player hp : " + this.characterHP + ' / ' + this.characterMHP)
                 if (this.characterHP <= 0) {
                     game.stop()
                 }
@@ -345,12 +356,16 @@ function Player() {
             if (spawnboss) {
                 if (boss.collidesWith(this)) {
                     this.characterHP -= boss.bossATK
-                    console.log("player hp : " + this.characterHP + ' / ' + this.characterMHP)
+                    this.reset()
                 }
             }
 
         }
 
+    }
+
+    tCharacter.reset = function() {
+        this.setPosition(440, 380)
     }
 
     return tCharacter
@@ -563,6 +578,7 @@ function Missile() {
             if (character.characterHP <= 0) {
                 game.stop()
             }
+            this.reset()
         }
     }
 
