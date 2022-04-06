@@ -552,13 +552,14 @@ function Boss() {
 
     tBoss.killed = function() {
         tBoss.hide()
+        window.location.href = './Endgame_Win.html'
     }
     return tBoss
 }
 
 function Missile() {
     //Boss fire
-    tMissile = new Sprite(game, "./entity/monsters/missile.png", 240, 160);
+    tMissile = new Sprite(game, "./entity/monsters/spell.png", 240, 160);
     tMissile.hide();
     tMissile.reset = function() {
         this.setPosition(boss.x, boss.y);
@@ -651,5 +652,5 @@ function Monster() {
 
 function death() {
     alert("You are dead!")
-    window.location.href = './index.html'
+    window.location.href = './Endgame_die.html'
 }
