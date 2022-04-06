@@ -13,9 +13,12 @@ var character
 
 //entity
 var warp;
-var countMon = 5
+var countMon = 2
 var monster = []
 var killedCondition = 0
+var killedCollision = 0
+
+var upgradeCount = 10
 var boss;
 var cooldown = 0
 var maxCooldown = 100
@@ -217,14 +220,26 @@ showPlayerStats = function() {
 showEntityStats = function() {
     var monsStatus = ""
 
-    for (let i = 0; i < monster.length; i++) {
-        monsStatus += "<table><th><strong> Monster </strong></th>"
+    if (monster.length <= 5) {
+        for (let i = 0; i < monster.length; i++) {
+            monsStatus += "<table><th><strong> Monster </strong></th>"
 
-        monsStatus += "<tr><td>Level : " + monster[i].level + "</td></tr>"
+            monsStatus += "<tr><td>Level : " + monster[i].level + "</td></tr>"
 
-        monsStatus += "<tr><td>HP: " + parseInt(monster[i].monsterHP) + "/" + parseInt(monster[i].monsterMHP) + "</td></tr>"
+            monsStatus += "<tr><td>HP: " + parseInt(monster[i].monsterHP) + "/" + parseInt(monster[i].monsterMHP) + "</td></tr>"
 
-        monsStatus += "<tr><td>damage : " + monster[i].monsterATK + "</td></tr></table><br>";
+            monsStatus += "<tr><td>damage : " + monster[i].monsterATK + "</td></tr></table><br>";
+        }
+    } else {
+        for (let i = 0; i < 5; i++) {
+            monsStatus += "<table><th><strong> Monster </strong></th>"
+
+            monsStatus += "<tr><td>Level : " + monster[i].level + "</td></tr>"
+
+            monsStatus += "<tr><td>HP: " + parseInt(monster[i].monsterHP) + "/" + parseInt(monster[i].monsterMHP) + "</td></tr>"
+
+            monsStatus += "<tr><td>damage : " + monster[i].monsterATK + "</td></tr></table><br>";
+        }
     }
 
     if (spawnboss) {
@@ -346,11 +361,17 @@ function Player() {
         if (type == 'monster') {
             if (enemies.collidesWith(this)) {
                 this.characterHP -= enemies.monsterATK;
+                killedCollision++;
                 if (this.characterHP <= 0) {
                     game.stop()
                     death()
                 }
                 enemies.reset()
+
+                for (let i = 0; i < countMon + parseInt(killedCollision / upgradeCount); i++) {
+                    monster[i] = new Monster()
+                }
+
                 character.skillPoint++;
                 character.killedCount++;
             }
@@ -633,24 +654,23 @@ function Monster() {
         }
     }
     tMonster.reset = function() {
-        //set new random position
+
         do {
             newX = Math.random() * this.cWidth;
             newY = Math.random() * this.cHeight;
             this.setPosition(Math.floor(newX), Math.floor(newY));
-            tMonster.monsterMHP = Math.floor(100 * ((this.level / 10) + 1.1));
+            tMonster.monsterMHP = Math.floor(100 * ((this.level / 10) + 1.1))
 
             tMonster.monsterHP = this.monsterMHP
-            tMonster.monsterATK = Math.floor(this.monsterHP / 10);
+            tMonster.monsterATK = parseInt(Math.floor(this.monsterHP / 10))
         }
         while (this.x < character.x + rangePlayerSpawn && this.x > character.x - rangePlayerSpawn && this.y < character.y + rangePlayerSpawn && this.y > character.y - rangePlayerSpawn)
     }
 
-    //tMonster.reset();
+    tMonster.reset();
     return tMonster;
 }
 
 function death() {
-    alert("You are dead!")
     window.location.href = './Endgame_die.html'
 }
