@@ -13,7 +13,7 @@ var character
 
 //entity
 var warp;
-var countMon = 2
+var countMon = 5
 var monster = []
 var killedCondition = 0
 var boss;
@@ -27,8 +27,8 @@ var killedDebug = 0
 var startStage = 3
 
 if (debug) {
-    killedCondition = killedDebug
-    stage = 3
+    // killedCondition = killedDebug
+    // stage = 3
 }
 
 function init() {
@@ -159,6 +159,9 @@ function entityCheck() {
         monster[i].update()
         character.checkCollision(monster[i], 'monster')
         character.fireball.checkCollision(monster[i], 'monster')
+        if (character.killedCount > 4) {
+            monster[i].level = parseInt(character.killedCount / 4)
+        }
     }
 
     if (stage == 3) {
@@ -172,6 +175,7 @@ function entityCheck() {
         warp.update()
         warp.checkCollision(character)
     }
+
 }
 
 showPlayerStats = function() {
@@ -191,25 +195,19 @@ showPlayerStats = function() {
 
     status += "<tr><td>HP: " + character.characterHP + "/" + character.characterMHP + "</td><td>";
     if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeHP\">Press (A) to upgrade</button>"
+        status += "<button>Press (A) to upgrade</button>"
     }
     status += "</td></tr>"
 
     status += "<tr><td>damage : " + character.characterATK + "</td><td>";
     if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeATK\">Press (S) to upgrade</button>"
-    }
-    status += "</td></tr>"
-
-    status += "<tr><td>defend : " + character.characterDEF + "</td><td>";
-    if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeDEF\">Press (D) to upgrade</button>"
+        status += "<button>Press (S) to upgrade</button>"
     }
     status += "</td></tr>"
 
     status += "<tr><td>speed: " + character.characterSPD + "</td><td>";
     if (character.skillPoint > 0) {
-        status += "<button id=\"upgradeSPD\">Press (F) to upgrade</button>"
+        status += "<button>Press (D) to upgrade</button>"
     }
     status += "</td></tr>"
 
@@ -221,6 +219,8 @@ showEntityStats = function() {
 
     for (let i = 0; i < monster.length; i++) {
         monsStatus += "<table><th><strong> Monster </strong></th>"
+
+        monsStatus += "<tr><td>Level : " + monster[i].level + "</td></tr>"
 
         monsStatus += "<tr><td>HP: " + parseInt(monster[i].monsterHP) + "/" + parseInt(monster[i].monsterMHP) + "</td></tr>"
 
@@ -249,11 +249,18 @@ function Player() {
     tCharacter.angleCharacter = "down"
 
     //setting status of character
-    tCharacter.characterHP = 900 //default = 100
-    tCharacter.characterMHP = 900 //default = 100
-    tCharacter.characterATK = 900 //default = 50
-    tCharacter.characterDEF = 900 //default = 50
-    tCharacter.characterSPD = 900 //default = 100
+    if (debug) {
+        tCharacter.characterHP = 900
+        tCharacter.characterMHP = 900
+        tCharacter.characterATK = 900
+        tCharacter.characterDEF = 900
+        tCharacter.characterSPD = 900
+    } else {
+        tCharacter.characterHP = 100
+        tCharacter.characterMHP = 100
+        tCharacter.characterATK = 50
+        tCharacter.characterSPD = 100
+    }
     tCharacter.skillPoint = 0
     tCharacter.killedCount = 0;
 
@@ -313,8 +320,6 @@ function Player() {
                 this.upgrade(2)
             } else if (keysDown[K_D]) {
                 this.upgrade(3)
-            } else if (keysDown[K_F]) {
-                this.upgrade(4)
             }
         }
     }
@@ -331,10 +336,6 @@ function Player() {
                 this.skillPoint--
                     break;
             case (3):
-                this.characterDEF += 10
-                this.skillPoint--
-                    break;
-            case (4):
                 this.characterSPD += 10
                 this.skillPoint--
                     break;
@@ -347,6 +348,7 @@ function Player() {
                 this.characterHP -= enemies.monsterATK;
                 if (this.characterHP <= 0) {
                     game.stop()
+                    death()
                 }
                 enemies.reset()
                 character.skillPoint++;
@@ -577,6 +579,7 @@ function Missile() {
             character.characterHP -= boss.bossATK
             if (character.characterHP <= 0) {
                 game.stop()
+                death()
             }
             this.reset()
         }
@@ -608,11 +611,12 @@ function Monster() {
     //monster stats
     tMonster.setSpeed(0);
     tMonster.level = 1
-    tMonster.monsterMHP = parseInt(Math.floor(100 * (this.level * 1.3)));
-    tMonster.monsterHP = this.monsterMHP
-    tMonster.monsterATK = Math.floor(this.monsterHP / 10);
+    tMonster.monsterMHP = 100;
+    tMonster.monsterHP = 100
+    tMonster.monsterATK = 10;
 
-
+    tMonster.lastHP = 0;
+    tMonster.defaultHP = 100
 
     tMonster.wriggle = function() {
         //change direction
@@ -633,11 +637,19 @@ function Monster() {
             newX = Math.random() * this.cWidth;
             newY = Math.random() * this.cHeight;
             this.setPosition(Math.floor(newX), Math.floor(newY));
-            tMonster.monsterMHP = ((Math.random() % 25) - 35) + character.characterMHP;
+            tMonster.monsterMHP = Math.floor(100 * ((this.level / 10) + 1.1));
+
             tMonster.monsterHP = this.monsterMHP
             tMonster.monsterATK = Math.floor(this.monsterHP / 10);
-        } while (this.x < character.x + rangePlayerSpawn && this.x > character.x - rangePlayerSpawn && this.y < character.y + rangePlayerSpawn && this.y > character.y - rangePlayerSpawn)
+        }
+        while (this.x < character.x + rangePlayerSpawn && this.x > character.x - rangePlayerSpawn && this.y < character.y + rangePlayerSpawn && this.y > character.y - rangePlayerSpawn)
     }
-    tMonster.reset();
+
+    //tMonster.reset();
     return tMonster;
+}
+
+function death() {
+    alert("You are dead!")
+    window.location.href = './index.html'
 }
