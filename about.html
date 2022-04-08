@@ -2,19 +2,48 @@
 <html>
 
 <head>
-    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
-    <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-    <link rel="stylesheet" href="./style/Mainmenu.css">
+  <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+  <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
+  <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+  <link rel="stylesheet" href="./style/Mainmenu.css">
 </head>
 
 <body>
-    <canvas id="canvas1"></canvas>
+  <canvas id="canvas1"></canvas>
+  <div class="centerdiv">
+    <p>Multimedia project</p>
+    <p>Created by</p>
+    <p>Sarawut Prakobkij 62160071</p>
+    <p>Pubodin Sukjaroen 62160295</p>
+    <p>Rattasart Wannasen 62160297</p>
 
-    <audio autoplay loop>
+    <p>Project file : https://github.com/ulknows/Multimedia_GameProject.git</p>
+
+  </div>
+
+  <audio autoplay loop>
     <source src="./sound/halloween_midnight.mp3" type="	audio/mpeg" />
   </audio>
 
 </body>
+
+<style>
+  .centerdiv {
+    height: 200px;
+    width: 500px;
+
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    margin-top: -100px;
+    margin-left: -200px;
+  }
+
+  p {
+    font-size: 25px;
+    color: white;
+    text-align: center;
+  }
+</style>
 
 </html>

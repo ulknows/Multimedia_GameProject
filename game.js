@@ -6,7 +6,7 @@ var screenHeight = 900
 var stage = 1
 
 //setting
-var bgSound = false
+var bgSound = true
 
 //character
 var character
@@ -30,8 +30,8 @@ var killedDebug = 0
 var startStage = 3
 
 if (debug) {
-    // killedCondition = killedDebug
-    // stage = 3
+    killedCondition = killedDebug
+    stage = 3
 }
 
 function init() {
