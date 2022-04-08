@@ -1,2 +1,5 @@
-# ignore temp file
+# ignore temp folder
 temp
+
+# ignore sound temp folder
+./sound/temp
