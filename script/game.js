@@ -38,7 +38,7 @@ function init() {
     //game and background
     if (stage == 1) {
         game = new Scene()
-        background = new Sprite(game, "../environment/map_1.png", screenWidth, screenHeight)
+        background = new Sprite(game, "./environment/map_1.png", screenWidth, screenHeight)
         background.setSpeed(0, 0)
         background.setPosition(900, 450)
 
@@ -54,10 +54,10 @@ function init() {
         game.start();
     } else if (stage == 2) {
         if (!debug) {
-            background.changeImage("../environment/map_2.png")
+            background.changeImage("./environment/map_2.png")
         } else {
             game = new Scene()
-            background = new Sprite(game, "../environment/map_2.png", screenWidth, screenHeight)
+            background = new Sprite(game, "./environment/map_2.png", screenWidth, screenHeight)
             background.setSpeed(0, 0)
 
             //monster and character
@@ -80,10 +80,10 @@ function init() {
         }
     } else if (stage == 3) {
         if (!debug) {
-            background.changeImage("../environment/map_3.png")
+            background.changeImage("./environment/map_3.png")
         } else {
             game = new Scene()
-            background = new Sprite(game, "../environment/map_3.png", screenWidth, screenHeight)
+            background = new Sprite(game, "./environment/map_3.png", screenWidth, screenHeight)
             background.setSpeed(0, 0)
 
             //monster and character
@@ -149,9 +149,9 @@ function update() {
 }
 
 function buildSound() {
-    fireballSound = new Sound("../sound/fireball.mp3")
-    flySound = new Sound("../sound/b_fly.wav")
-    backgroundSound = new Sound("../sound/videoplayback_1.mp4")
+    fireballSound = new Sound("./sound/fireball.mp3")
+    flySound = new Sound("./sound/b_fly.wav")
+    backgroundSound = new Sound("./sound/videoplayback_1.mp4")
 }
 var spawnboss = false;
 
@@ -255,7 +255,7 @@ showEntityStats = function() {
 
 function Player() {
     //creating character and set position
-    var tCharacter = new Sprite(game, "../entity/player/Carbon Ghost.png", 128, 94)
+    var tCharacter = new Sprite(game, "./entity/player/Carbon Ghost.png", 128, 94)
     tCharacter.setPosition(440, 380)
     tCharacter.setSpeed(0)
 
@@ -398,7 +398,7 @@ function Warp() {
     var countIncrease = 2
 
     if (stage == 1) {
-        var tWarp = new Sprite(game, "../environment/portal.gif", 100, 200)
+        var tWarp = new Sprite(game, "./environment/portal.gif", 100, 200)
         tWarp.setPosition(1200, 400)
         tWarp.setSpeed(0)
 
@@ -413,7 +413,7 @@ function Warp() {
         return tWarp
 
     } else if (stage == 2) {
-        var tWarp = new Sprite(game, "../environment/portal.gif", 100, 200)
+        var tWarp = new Sprite(game, "./environment/portal.gif", 100, 200)
         tWarp.setPosition(1200, 400)
         tWarp.setSpeed(0)
 
@@ -427,7 +427,7 @@ function Warp() {
         return tWarp
 
     } else if (stage == 3) {
-        var tWarp = new Sprite(game, "../environment/portal.gif", 100, 200)
+        var tWarp = new Sprite(game, "./environment/portal.gif", 100, 200)
         tWarp.setPosition(1200, 400)
         tWarp.setSpeed(0)
 
@@ -435,7 +435,7 @@ function Warp() {
             // stage = 0;
             if (this.collidesWith(character)) {
                 console.log('End')
-                window.location.href = "../Endgame_Win.html";
+                window.location.href = "./Endgame_Win.html";
             }
         }
         return tWarp
@@ -446,7 +446,7 @@ function Warp() {
 function FireBall() {
     var fireballAvailable = true
     var fireballShown = false
-    var sFireball = new Sprite(game, "../entity/player/fire_ball.png", 30, 20)
+    var sFireball = new Sprite(game, "./entity/player/fire_ball.png", 30, 20)
     sFireball.hide()
 
     // [x, y]
@@ -529,7 +529,7 @@ var lasty = 450
 
 function Boss() {
 
-    var tBoss = new Sprite(game, '../entity/monsters/FBoss.gif', 192, 224)
+    var tBoss = new Sprite(game, './entity/monsters/FBoss.gif', 192, 224)
     tBoss.show()
     tBoss.setPosition(lastx, lasty)
     tBoss.setSpeed(0)
@@ -573,14 +573,14 @@ function Boss() {
 
     tBoss.killed = function() {
         tBoss.hide()
-        window.location.href = '../Endgame_Win.html'
+        window.location.href = './Endgame_Win.html'
     }
     return tBoss
 }
 
 function Missile() {
     //Boss fire
-    tMissile = new Sprite(game, "../entity/monsters/spell.png", 240, 160);
+    tMissile = new Sprite(game, "./entity/monsters/spell.png", 240, 160);
     tMissile.hide();
     tMissile.reset = function() {
         this.setPosition(boss.x, boss.y);
@@ -618,13 +618,13 @@ function Monster() {
 
     //creating monster
     if (stage == 1) {
-        var tMonster = new Sprite(game, "../entity/monsters/Shadow_Brute.png", 64, 256)
+        var tMonster = new Sprite(game, "./entity/monsters/Shadow_Brute.png", 64, 256)
         tMonster.loadAnimation(64, 256, 16, 32)
     } else if (stage == 2) {
-        var tMonster = new Sprite(game, "../entity/monsters/Harvey_Beach.png", 64, 128)
+        var tMonster = new Sprite(game, "./entity/monsters/Harvey_Beach.png", 64, 128)
         tMonster.loadAnimation(64, 128, 16, 32)
     } else if (stage == 3) {
-        var tMonster = new Sprite(game, "../entity/monsters/Angry_Roger.png", 127, 127)
+        var tMonster = new Sprite(game, "./entity/monsters/Angry_Roger.png", 127, 127)
         tMonster.loadAnimation(127, 127, 31.75, 31.75)
     }
     tMonster.generateAnimationCycles()
@@ -672,5 +672,5 @@ function Monster() {
 }
 
 function death() {
-    window.location.href = '../Endgame_die.html'
+    window.location.href = './Endgame_die.html'
 }
