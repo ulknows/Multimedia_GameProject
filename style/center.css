@@ -1,0 +1,8 @@
+body{
+    text-align: center;
+    bottom: 50px;
+    background-image: url('../environment/main_wallpaper.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100% 100%;
+}
