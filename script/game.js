@@ -368,8 +368,11 @@ function Player() {
                 }
                 enemies.reset()
 
-                for (let i = 0; i < countMon + parseInt(killedCollision / upgradeCount); i++) {
-                    monster[i] = new Monster()
+                // for (let i = 0; i < countMon + parseInt(killedCollision / upgradeCount); i++) {
+                //     monster[i] = new Monster()
+                // }
+                while (monster.length < parseInt(killedCollision / upgradeCount)) {
+                    monster[monster.length] = new Monster()
                 }
 
                 character.skillPoint++;
@@ -654,7 +657,7 @@ function Monster() {
         }
     }
     tMonster.reset = function() {
-
+        this.hide()
         do {
             newX = Math.random() * this.cWidth;
             newY = Math.random() * this.cHeight;
@@ -665,6 +668,7 @@ function Monster() {
             tMonster.monsterATK = parseInt(Math.floor(this.monsterHP / 10))
         }
         while (this.x < character.x + rangePlayerSpawn && this.x > character.x - rangePlayerSpawn && this.y < character.y + rangePlayerSpawn && this.y > character.y - rangePlayerSpawn)
+        this.show()
     }
 
     tMonster.reset();
